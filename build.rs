@@ -5,10 +5,29 @@ extern crate vcpkg;
 
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path,PathBuf};
 use std::process::Command;
 
+extern crate conan;
+use conan::*;
+
 fn main() {
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let conan_profile = format!("{}-{}", target_os, target_arch);
+
+    let command = InstallCommandBuilder::new()
+        .with_profile(&conan_profile)
+        .build_policy(BuildPolicy::Never)
+        .recipe_path(Path::new("conanfile.txt"))
+        .build();
+
+    if let Some(build_info) = command.generate() {
+        println!("using conan build info");
+        build_info.cargo_emit();
+        return;
+    }
+
     println!("cargo:rerun-if-env-changed=LIBZ_SYS_STATIC");
     println!("cargo:rerun-if-changed=build.rs");
     let host = env::var("HOST").unwrap();
