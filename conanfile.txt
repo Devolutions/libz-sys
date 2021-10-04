@@ -1,3 +1,2 @@
 [requires]
-zlib/1.2.11-5@devolutions/stable
-
+zlib/1.2.11@devolutions/stable
